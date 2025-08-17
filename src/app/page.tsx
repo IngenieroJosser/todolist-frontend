@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 
 type Todo = {
@@ -18,6 +19,7 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showParticles, setShowParticles] = useState(false); // Nuevo estado para partículas
   const heroRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Solo renderizar partículas en el cliente
@@ -123,10 +125,14 @@ export default function Home() {
           </div>
           
           <div className="flex space-x-4">
-            <button className="px-4 py-2 rounded-lg bg-[#1a2a3a] hover:bg-[#2a3a4a] transition-all duration-300 shadow-lg hover:shadow-[#5ab9ea]/20">
+            <button
+              onClick={() => router.push('/sign-in')}
+              className="px-4 py-2 rounded-lg bg-[#1a2a3a] hover:bg-[#2a3a4a] transition-all duration-300 shadow-lg hover:shadow-[#5ab9ea]/20">
               Iniciar sesión
             </button>
-            <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#5ab9ea] to-[#84ceeb] text-[#0e1a26] font-medium hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#5ab9ea]/40 transform hover:-translate-y-0.5">
+            <button 
+              onClick={() => router.push('/sign-up')}
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#5ab9ea] to-[#84ceeb] text-[#0e1a26] font-medium hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#5ab9ea]/40 transform hover:-translate-y-0.5">
               Registrarse
             </button>
           </div>
