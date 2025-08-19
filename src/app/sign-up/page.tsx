@@ -5,11 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 export default function SigUpPage() {
-  const [name, setName] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [age, setAge] = useState<number | ''>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -18,6 +15,12 @@ export default function SigUpPage() {
   const [showParticles, setShowParticles] = useState<boolean>(false);
   const [passwordStrength, setPasswordStrength] = useState<number>(0);
   const [step, setStep] = useState<number>(1); // Para formulario multipasos
+  const [formDataSignUp, setFormDataSignUp] = useState({
+    name: '',
+    email: '',
+    password: '',
+    age: ''
+  });
   const router = useRouter();
   
   const heroRef = useRef<HTMLDivElement>(null);
@@ -33,32 +36,32 @@ export default function SigUpPage() {
 
   useEffect(() => {
     // Calcular fortaleza de contraseña
-    if (password.length === 0) {
+    if (formDataSignUp.password.length === 0) {
       setPasswordStrength(0);
       return;
     }
 
     let strength = 0;
-    if (password.length >= 8) strength += 1;
-    if (/[A-Z]/.test(password)) strength += 1;
-    if (/[0-9]/.test(password)) strength += 1;
-    if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+    if (formDataSignUp.password.length >= 8) strength += 1;
+    if (/[A-Z]/.test(formDataSignUp.password)) strength += 1;
+    if (/[0-9]/.test(formDataSignUp.password)) strength += 1;
+    if (/[^A-Za-z0-9]/.test(formDataSignUp.password)) strength += 1;
     
     setPasswordStrength(strength);
-  }, [password]);
+  }, [formDataSignUp.password]);
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!name.trim()) {
+    if (!formDataSignUp.name.trim()) {
       newErrors.name = 'El nombre es requerido';
-    } else if (name.trim().length < 6) {
+    } else if (formDataSignUp.name.trim().length < 6) {
       newErrors.name = 'El nombre debe tener al menos 6 caracteres';
     }
     
-    if (!email) {
+    if (!formDataSignUp.email) {
       newErrors.email = 'El email es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formDataSignUp.email)) {
       newErrors.email = 'Ingresa un email válido';
     }
     
@@ -69,23 +72,23 @@ export default function SigUpPage() {
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!password) {
+    if (!formDataSignUp.password) {
       newErrors.password = 'La contraseña es requerida';
-    } else if (password.length < 8) {
+    } else if (formDataSignUp.password.length < 8) {
       newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
     } else if (passwordStrength < 3) {
       newErrors.password = 'La contraseña es demasiado débil';
     }
     
-    if (password !== confirmPassword) {
+    if (formDataSignUp.password !== confirmPassword) {
       newErrors.confirmPassword = 'Las contraseñas no coinciden';
     }
     
-    if (!age) {
+    if (!formDataSignUp.age) {
       newErrors.age = 'La edad es requerida';
-    } else if (Number(age) < 13) {
+    } else if (Number(formDataSignUp.age) < 13) {
       newErrors.age = 'Debes tener al menos 13 años';
-    } else if (Number(age) > 120) {
+    } else if (Number(formDataSignUp.age) > 120) {
       newErrors.age = 'Ingresa una edad válida';
     }
     
@@ -266,8 +269,8 @@ export default function SigUpPage() {
                           <input
                             id="name"
                             type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={formDataSignUp.name}
+                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, name: e.target.value })}
                             className={`w-full bg-[#0e1a26] border ${
                               errors.name ? 'border-red-500' : 'border-[#2a3a4a]'
                             } rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]`}
@@ -292,8 +295,8 @@ export default function SigUpPage() {
                           <input
                             id="email"
                             type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={formDataSignUp.email}
+                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, email: e.target.value })}
                             className={`w-full bg-[#0e1a26] border ${
                               errors.email ? 'border-red-500' : 'border-[#2a3a4a]'
                             } rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]`}
@@ -336,8 +339,8 @@ export default function SigUpPage() {
                           <input
                             id="password"
                             type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={formDataSignUp.password}
+                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, password: e.target.value })}
                             className={`w-full bg-[#0e1a26] border ${
                               errors.password ? 'border-red-500' : 'border-[#2a3a4a]'
                             } rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]`}
@@ -420,8 +423,8 @@ export default function SigUpPage() {
                           <input
                             id="age"
                             type="number"
-                            value={age}
-                            onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')}
+                            value={formDataSignUp.age}
+                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, age: e.target.value })}
                             className={`w-full bg-[#0e1a26] border ${
                               errors.age ? 'border-red-500' : 'border-[#2a3a4a]'
                             } rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]`}

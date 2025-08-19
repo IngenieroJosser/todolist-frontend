@@ -3,16 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { signIn } from '@/services/auth-service';
 
 export default function SignInPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [showParticles, setShowParticles] = useState<boolean>(false);
+  const [formDataSignIn, setFormDataSignIn] = useState({
+    email: '',
+    password: '',
+  });
   const router = useRouter();
   
   const heroRef = useRef<HTMLDivElement>(null);
@@ -26,20 +29,24 @@ export default function SignInPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
-    // Simular autenticación
-    setTimeout(() => {
-      if (email === 'usuario@ejemplo.com' && password === 'contraseña') {
-        router.push('/dashboard');
-      } else {
-        setError('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
-      }
+    const { email, password } = formDataSignIn;
+
+    try {
+      const res = await signIn({ email, password });
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("userRole", res.user.email);
+      localStorage.setItem("userName", res.user.name);
+      // toast.success(`Hola, ${response.user.name || "Usuario"}!`);
+      localStorage.setItem("user", JSON.stringify(res.user));
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
@@ -132,7 +139,7 @@ export default function SignInPage() {
               <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#5ab9ea] rounded-full filter blur-3xl opacity-20 z-0 animate-pulse"></div>
               <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-[#84ceeb] rounded-full filter blur-3xl opacity-15 z-0"></div>
               
-              <form onSubmit={handleLogin} className="space-y-6">
+              <form onSubmit={handleOnSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-[#a9c7d8] mb-2">
                     Correo Electrónico
@@ -141,8 +148,8 @@ export default function SignInPage() {
                     <input
                       id="email"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={formDataSignIn.email}
+                      onChange={(e) => setFormDataSignIn({ ...formDataSignIn, email: e.target.value })}
                       className="w-full bg-[#0e1a26] border border-[#2a3a4a] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]"
                       placeholder="tu@email.com"
                       required
@@ -164,8 +171,8 @@ export default function SignInPage() {
                     <input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={formDataSignIn.password}
+                      onChange={(e) => setFormDataSignIn({ ...formDataSignIn, password: e.target.value })}
                       className="w-full bg-[#0e1a26] border border-[#2a3a4a] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]"
                       placeholder="••••••••"
                       required
