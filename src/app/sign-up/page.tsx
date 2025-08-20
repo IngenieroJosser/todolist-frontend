@@ -78,7 +78,7 @@ export default function SigUpPage() {
     } else if (formDataSignUp.password.length < 8) {
       newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
     } else if (passwordStrength < 3) {
-      newErrors.password = 'La contraseña es demasiado débil';
+      newErrors.password = 'La contraseña es demasiado débil, (pa$wor@1)';
     }
     
     if (formDataSignUp.password !== confirmPassword) {
@@ -194,9 +194,9 @@ export default function SigUpPage() {
             </button>
             <button 
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#5ab9ea] to-[#84ceeb] text-[#0e1a26] font-medium hover:opacity-90 transition-all duration-300 shadow-lg hover:shadow-[#5ab9ea]/40"
-              onClick={() => router.push('/login')}
+              onClick={() => router.push('/sign-in')}
             >
-              Iniciar Sesión
+              Iniciar sesión
             </button>
           </div>
         </div>
@@ -383,9 +383,9 @@ export default function SigUpPage() {
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-xs text-[#a9c7d8]">Fortaleza de la contraseña</span>
                             <span className={`text-xs font-medium ${
-                              passwordStrength === 1 ? 'text-red-500' : 
-                              passwordStrength === 2 ? 'text-yellow-500' : 
-                              passwordStrength >= 3 ? 'text-green-500' : 'text-[#a9c7d8]'
+                              passwordStrength === 2 ? 'text-red-500' : 
+                              passwordStrength === 4 ? 'text-yellow-500' : 
+                              passwordStrength >= 6? 'text-green-500' : 'text-[#a9c7d8]'
                             }`}>
                               {getPasswordStrengthText()}
                             </span>
@@ -394,9 +394,9 @@ export default function SigUpPage() {
                             <div 
                               className={`h-full rounded-full transition-all duration-500 ${
                                 passwordStrength === 0 ? 'w-0' : 
-                                passwordStrength === 1 ? 'w-1/4' : 
-                                passwordStrength === 2 ? 'w-1/2' : 
-                                passwordStrength === 3 ? 'w-3/4' : 'w-full'
+                                passwordStrength === 2 ? 'w-1/4' : 
+                                passwordStrength === 4 ? 'w-1/2' : 
+                                passwordStrength === 6 ? 'w-3/4' : 'w-full'
                               } ${getPasswordStrengthColor()}`}
                             ></div>
                           </div>

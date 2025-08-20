@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { signIn } from '@/services/auth-service';
+import Link from 'next/link';
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -244,7 +245,7 @@ export default function SignInPage() {
                       </svg>
                       Iniciando sesión...
                     </>
-                  ) : 'Iniciar Sesión'}
+                  ) : 'Iniciar sesión'}
                 </button>
               </form>
 
@@ -278,9 +279,9 @@ export default function SignInPage() {
 
               <div className="text-center text-[#a9c7d8] text-sm mt-8">
                 ¿No tienes una cuenta?{' '}
-                <a href="#" className="text-[#5ab9ea] font-medium hover:underline">
+                <Link href="/sign-up" className="text-[#5ab9ea] font-medium hover:underline">
                   Regístrate ahora
-                </a>
+                </Link>
               </div>
             </motion.div>
           </div>
