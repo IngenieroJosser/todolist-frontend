@@ -17,11 +17,14 @@ export default function WorkSpaceDashboardPage() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showCreateProyect, setShowCreateProyect] = useState<boolean>(false);
+  const [projectName, setProjectName] = useState<string>('');
+  const [projectDescription, setProjectDescription] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
     setShowParticles(true);
-    
+
     // Datos de ejemplo
     setTodos([
       { id: 1, text: 'Revisar documentación del proyecto', completed: true, priority: 'high', dueDate: '2023-10-15', tags: ['Trabajo', 'Urgente'] },
@@ -43,10 +46,10 @@ export default function WorkSpaceDashboardPage() {
       const now = new Date();
       setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     };
-    
+
     updateTime();
     const interval = setInterval(updateTime, 60000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -59,7 +62,7 @@ export default function WorkSpaceDashboardPage() {
         priority: 'medium' as const,
         tags: []
       };
-      
+
       setTodos([newTask, ...todos]);
       setNewTodo('');
       showNotificationMessage('Tarea agregada correctamente');
@@ -69,12 +72,12 @@ export default function WorkSpaceDashboardPage() {
   const toggleTodo = (id: number) => {
     const updatedTodos = todos.map(todo => {
       if (todo.id === id) {
-        return {...todo, completed: !todo.completed};
+        return { ...todo, completed: !todo.completed };
       }
       return todo;
     });
     setTodos(updatedTodos);
-    
+
     const task = todos.find(t => t.id === id);
     if (task) {
       showNotificationMessage(`Tarea ${!task.completed ? 'completada' : 'marcada como pendiente'}`);
@@ -96,16 +99,48 @@ export default function WorkSpaceDashboardPage() {
   const highPriorityCount = todos.filter(todo => todo.priority === 'high' && !todo.completed).length;
 
   const filteredTodos = todos.filter(todo => {
-    const statusMatch = activeTab === 'all' || 
-                        (activeTab === 'completed' && todo.completed) || 
-                        (activeTab === 'active' && !todo.completed);
-    
-    const projectMatch = activeProject === 'all' || 
-                         (activeProject === 'high' && todo.priority === 'high') ||
-                         (todo.tags && todo.tags.includes(activeProject));
-    
+    const statusMatch = activeTab === 'all' ||
+      (activeTab === 'completed' && todo.completed) ||
+      (activeTab === 'active' && !todo.completed);
+
+    const projectMatch = activeProject === 'all' ||
+      (activeProject === 'high' && todo.priority === 'high') ||
+      (todo.tags && todo.tags.includes(activeProject));
+
     return statusMatch && projectMatch;
   });
+
+  const handleCreateProject = async () => {
+    try {
+      // Lógica para crear el proyecto en tu API
+      const newProject = {
+        name: projectName,
+        description: projectDescription
+      };
+
+      // Ejemplo de llamada a la API
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newProject),
+      });
+
+      if (response.ok) {
+        // Proyecto creado exitosamente
+        setShowCreateProyect(false);
+        setProjectName('');
+        setProjectDescription("");
+        // Actualizar la lista de proyectos
+      } else {
+        // Manejar error
+        console.error('Error al crear el proyecto');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0e1a26] to-[#0f1a27] text-white flex">
@@ -119,7 +154,7 @@ export default function WorkSpaceDashboardPage() {
         {showParticles && (
           <>
             {[...Array(30)].map((_, i) => (
-              <div 
+              <div
                 key={i}
                 className="absolute rounded-full bg-white animate-pulse"
                 style={{
@@ -140,7 +175,7 @@ export default function WorkSpaceDashboardPage() {
 
       {/* Overlay para móvil */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -153,7 +188,7 @@ export default function WorkSpaceDashboardPage() {
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Botón de cerrar sidebar en móvil */}
-        <button 
+        <button
           className="lg:hidden absolute top-4 right-4 text-[#a9c7d8] hover:text-white"
           onClick={() => setIsSidebarOpen(false)}
         >
@@ -191,8 +226,8 @@ export default function WorkSpaceDashboardPage() {
           <div className="text-xs font-semibold text-[#5a7a8c] mb-3 uppercase tracking-wider">Mis proyectos</div>
           <div className="space-y-2">
             {projects.map(project => (
-              <button 
-                key={project.id} 
+              <button
+                key={project.id}
                 className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-all duration-300 flex items-center justify-between"
                 onClick={() => setActiveProject(project.name)}
               >
@@ -203,7 +238,9 @@ export default function WorkSpaceDashboardPage() {
                 <span className="text-xs bg-[#1a2a3a] px-2 py-1 rounded-full min-w-[2rem] flex justify-center">{project.taskCount}</span>
               </button>
             ))}
-            <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-all duration-300 text-[#5ab9ea] flex items-center">
+            <button
+              onClick={() => setShowCreateProyect(true)}
+              className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-all duration-300 text-[#5ab9ea] flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -244,7 +281,7 @@ export default function WorkSpaceDashboardPage() {
         <header className="bg-[#0e1a26]/80 backdrop-blur-md border-b border-[#2a3a4a] p-4 lg:p-6 sticky top-0 z-30">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
-              <button 
+              <button
                 className="lg:hidden mr-3 text-[#a9c7d8] hover:text-white"
                 onClick={() => setIsSidebarOpen(true)}
               >
@@ -329,7 +366,7 @@ export default function WorkSpaceDashboardPage() {
                 <span className="ml-1 sm:hidden">comp.</span>
               </div>
             </div>
-            
+
             {/* Input para nueva tarea */}
             <div className="mb-4">
               <div className="relative">
@@ -341,8 +378,8 @@ export default function WorkSpaceDashboardPage() {
                   className="w-full bg-[#0e1a26] border border-[#2a3a4a] rounded-lg lg:rounded-xl px-4 py-2 lg:py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c] text-sm lg:text-base"
                   onKeyPress={(e) => e.key === 'Enter' && addTodo()}
                 />
-                <button 
-                  onClick={addTodo} 
+                <button
+                  onClick={addTodo}
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gradient-to-r from-[#5ab9ea] to-[#84ceeb] w-7 h-7 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-[#0e1a26] hover:opacity-90 transition-all duration-300 shadow-md"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -351,45 +388,43 @@ export default function WorkSpaceDashboardPage() {
                 </button>
               </div>
             </div>
-            
+
             {/* Filtros */}
             <div className="flex flex-wrap gap-2 mb-4">
-              <button 
-                onClick={() => setActiveTab('all')} 
+              <button
+                onClick={() => setActiveTab('all')}
                 className={`px-3 py-1 lg:px-4 lg:py-2 rounded-lg text-xs lg:text-sm transition-all duration-300 ${activeTab === 'all' ? 'bg-[#5ab9ea] text-[#0e1a26]' : 'bg-[#0e1a26] hover:bg-[#1a2a3a]'}`}
               >
                 Todas
               </button>
-              <button 
-                onClick={() => setActiveTab('active')} 
+              <button
+                onClick={() => setActiveTab('active')}
                 className={`px-3 py-1 lg:px-4 lg:py-2 rounded-lg text-xs lg:text-sm transition-all duration-300 ${activeTab === 'active' ? 'bg-[#5ab9ea] text-[#0e1a26]' : 'bg-[#0e1a26] hover:bg-[#1a2a3a]'}`}
               >
                 Activas
               </button>
-              <button 
-                onClick={() => setActiveTab('completed')} 
+              <button
+                onClick={() => setActiveTab('completed')}
                 className={`px-3 py-1 lg:px-4 lg:py-2 rounded-lg text-xs lg:text-sm transition-all duration-300 ${activeTab === 'completed' ? 'bg-[#5ab9ea] text-[#0e1a26]' : 'bg-[#0e1a26] hover:bg-[#1a2a3a]'}`}
               >
                 Completadas
               </button>
             </div>
-            
+
             {/* Lista de tareas */}
             <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
               {filteredTodos.map(todo => (
-                <div 
-                  key={todo.id} 
-                  className={`flex items-center p-3 rounded-xl transition-all duration-300 group ${
-                    todo.completed ? 'bg-[#0e1a26]/50' : 'bg-[#0e1a26] hover:bg-[#1a2a3a]'
-                  }`}
-                >
-                  <button 
-                    onClick={() => toggleTodo(todo.id)}
-                    className={`w-5 h-5 lg:w-6 lg:h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-all duration-300 flex-shrink-0 ${
-                      todo.completed 
-                        ? 'border-[#5ab9ea] bg-[#5ab9ea]' 
-                        : 'border-[#2a3a4a] hover:border-[#5ab9ea]'
+                <div
+                  key={todo.id}
+                  className={`flex items-center p-3 rounded-xl transition-all duration-300 group ${todo.completed ? 'bg-[#0e1a26]/50' : 'bg-[#0e1a26] hover:bg-[#1a2a3a]'
                     }`}
+                >
+                  <button
+                    onClick={() => toggleTodo(todo.id)}
+                    className={`w-5 h-5 lg:w-6 lg:h-6 rounded-full border-2 flex items-center justify-center mr-3 transition-all duration-300 flex-shrink-0 ${todo.completed
+                      ? 'border-[#5ab9ea] bg-[#5ab9ea]'
+                      : 'border-[#2a3a4a] hover:border-[#5ab9ea]'
+                      }`}
                   >
                     {todo.completed && (
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 lg:h-4 lg:w-4 text-[#0e1a26]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -412,8 +447,8 @@ export default function WorkSpaceDashboardPage() {
                       )}
                     </div>
                   </div>
-                  <button 
-                    onClick={() => deleteTodo(todo.id)} 
+                  <button
+                    onClick={() => deleteTodo(todo.id)}
                     className="text-[#a9c7d8] hover:text-white transition-colors duration-300 opacity-0 group-hover:opacity-100 ml-2 flex-shrink-0"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 lg:h-5 lg:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -422,7 +457,7 @@ export default function WorkSpaceDashboardPage() {
                   </button>
                 </div>
               ))}
-              
+
               {filteredTodos.length === 0 && (
                 <div className="text-center py-8 text-[#a9c7d8]">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 lg:h-12 lg:w-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -443,6 +478,108 @@ export default function WorkSpaceDashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <span className="text-sm">{notificationMessage}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Modal para crear proyecto */}
+        {showCreateProyect && (
+          <div className="fixed inset-0 bg-[rgba(14,26,38,0.85)] backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="bg-gradient-to-br from-[#0e1a26] to-[#132231] border-2 border-[#2a3a4a] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 animate-scaleIn">
+              {/* Encabezado con gradiente */}
+              <div className="bg-gradient-to-r from-[#2a3a4a] to-[#1a2a3a] p-5 border-b border-[#5ab9ea]/30">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="mr-3 p-2 bg-[#5ab9ea]/10 rounded-lg">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#5ab9ea]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-white">Crear Nuevo Proyecto</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowCreateProyect(false)}
+                    className="text-[#a9c7d8] hover:text-white transition-colors p-1 rounded-full hover:bg-[#2a3a4a]"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-[#a9c7d8] text-sm mt-2 ml-11">Completa la información para crear un nuevo proyecto</p>
+              </div>
+
+              <div className="p-6">
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateProject();
+                }}>
+                  <div className="mb-5 relative">
+                    <label htmlFor="projectName" className="block text-sm font-medium text-[#a9c7d8] mb-2">
+                      Nombre del Proyecto
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#5ab9ea]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        id="projectName"
+                        value={projectName}
+                        onChange={(e) => setProjectName(e.target.value)}
+                        className="w-full bg-[#1a2a3a] border border-[#2a3a4a] rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all"
+                        placeholder="Ingresa el nombre del proyecto"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-6 relative">
+                    <label htmlFor="projectDescription" className="block text-sm font-medium text-[#a9c7d8] mb-2">
+                      Descripción
+                    </label>
+                    <div className="relative">
+                      <div className="absolute top-3 left-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#5ab9ea]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                      </div>
+                      <textarea
+                        id="projectDescription"
+                        value={projectDescription}
+                        onChange={(e) => setProjectDescription(e.target.value)}
+                        rows={4}
+                        className="w-full bg-[#1a2a3a] border border-[#2a3a4a] rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all"
+                        placeholder="Describe el propósito del proyecto..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateProyect(false)}
+                      className="px-5 py-2.5 bg-[#1a2a3a] text-[#a9c7d8] border border-[#2a3a4a] rounded-lg hover:bg-[#2a3a4a] transition-all duration-300 flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-gradient-to-r from-[#5ab9ea] to-[#4ca5d5] text-[#0e1a26] font-medium rounded-lg hover:from-[#4ca5d5] hover:to-[#3e91c1] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Crear Proyecto
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
