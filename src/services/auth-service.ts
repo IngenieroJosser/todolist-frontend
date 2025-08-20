@@ -1,4 +1,4 @@
-import { SignUpData, AuthResponse, SignInData } from "@/lib/typings.ts";
+import { SignUpData, AuthResponse, SignInData } from "@/lib/typings";
 import { apiRequest } from "@/lib/api";
 
 export async function signUp(data: SignUpData): Promise<AuthResponse> {
