@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { signUp } from '@/services/auth-service';
 
 export default function SigUpPage() {
-  
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
