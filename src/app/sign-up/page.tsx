@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { signUp } from '@/services/auth-service';
 
 export default function SigUpPage() {
   
@@ -102,25 +103,37 @@ export default function SigUpPage() {
     }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleOnSubmitSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateStep2()) return;
     
     setIsLoading(true);
-    
-    // Simular registro
-    setTimeout(() => {
+
+    try {
+      if (
+        !formDataSignUp.name 
+        || !formDataSignUp.email 
+        || !formDataSignUp.age
+        || !formDataSignUp.password
+      ) {
+        console.warn("Todos los datos son requeridos, debes llenar el formulario");
+      }
+      
+      await signUp(formDataSignUp);
+      router.push("/sign-in");
+    } catch (error: any) {
+      console.error(error.message || "Error al registrarse.");
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 1500);
+    }
   };
 
   const getPasswordStrengthColor = () => {
     if (passwordStrength === 0) return 'bg-gray-500';
-    if (passwordStrength === 1) return 'bg-red-500';
-    if (passwordStrength === 2) return 'bg-yellow-500';
-    if (passwordStrength === 3) return 'bg-green-500';
+    if (passwordStrength === 2) return 'bg-red-500';
+    if (passwordStrength === 4) return 'bg-yellow-500';
+    if (passwordStrength === 6) return 'bg-green-500';
     return 'bg-teal-500';
   };
 
@@ -250,7 +263,7 @@ export default function SigUpPage() {
                 </div>
               </div>
               
-              <form onSubmit={handleRegister} className="space-y-6">
+              <form onSubmit={handleOnSubmitSignUp} className="space-y-6">
                 <AnimatePresence mode="wait">
                   {step === 1 ? (
                     <motion.div

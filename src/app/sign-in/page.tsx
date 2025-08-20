@@ -29,7 +29,7 @@ export default function SignInPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleOnSubmit = async (e: React.FormEvent) => {
+  const handleOnSubmitSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -139,7 +139,7 @@ export default function SignInPage() {
               <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#5ab9ea] rounded-full filter blur-3xl opacity-20 z-0 animate-pulse"></div>
               <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-[#84ceeb] rounded-full filter blur-3xl opacity-15 z-0"></div>
               
-              <form onSubmit={handleOnSubmit} className="space-y-6">
+              <form onSubmit={handleOnSubmitSignIn} className="space-y-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-[#a9c7d8] mb-2">
                     Correo Electrónico

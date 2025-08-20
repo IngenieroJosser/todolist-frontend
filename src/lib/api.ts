@@ -63,7 +63,7 @@ export const apiRequest = async <T>(
         message = "No autorizado - Token inválido o expirado";
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          window.location.href = "/login";
+          window.location.href = "/sign-in";
         }
       } else if (status === 403) {
         message = "Acceso prohibido";
