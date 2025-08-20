@@ -57,3 +57,19 @@ export type SystemStats = {
   projects: number;
   teams: number;
 };
+
+export interface TaskData {
+  nameTask: string;
+  description: string;
+  statusTask: string;
+  priority: string;
+  dueDate: Date;
+  startDate?: Date;
+  completedAt?: Date;
+}
+
+export interface TaskResponse {
+  success: boolean;
+  message: string;
+  data?: never;
+}
