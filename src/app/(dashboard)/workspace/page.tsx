@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Project, Todo } from '@/lib/interface';
 
@@ -13,10 +12,9 @@ export default function WorkSpaceDashboardPage() {
   const [activeProject, setActiveProject] = useState('all');
   const [showParticles, setShowParticles] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
-  const [userData, setUserData] = useState({ name: 'Alex Rodríguez', email: 'alex@ejemplo.com' });
+  const [userData] = useState({ name: 'Alex Rodríguez', email: 'alex@ejemplo.com' });
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
-  const router = useRouter();
 
   useEffect(() => {
     setShowParticles(true);
