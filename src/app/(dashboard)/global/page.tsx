@@ -3,30 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
+import { SystemStats, User } from '@/lib/interface';
 
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  status: 'active' | 'inactive' | 'suspended';
-  lastLogin: string;
-  tasks: number;
-  projects: number;
-  role: 'admin' | 'user' | 'moderator';
-};
-
-type SystemStats = {
-  totalUsers: number;
-  activeUsers: number;
-  totalTasks: number;
-  completedTasks: number;
-  storageUsed: number;
-  storageTotal: number;
-  projects: number;
-  teams: number;
-};
-
-export default function DashboardTasly() {
+export default function DashboardAdminTasly() {
   const [activeTab, setActiveTab] = useState('overview');
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<SystemStats>({
