@@ -47,14 +47,14 @@ export default function SignInPage() {
       localStorage.setItem("user", JSON.stringify(res));
 
       router.push("/workspace")
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Error desconocido');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
+  const handleSocialLogin = () => {
     setIsLoading(true);
     setError('');
     
@@ -266,7 +266,7 @@ export default function SignInPage() {
                     type="button"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleSocialLogin(social.provider)}
+                    onClick={() => handleSocialLogin()}
                     className="py-3 rounded-xl bg-[#0e1a26] border border-[#2a3a4a] hover:bg-[#1a2a3a] transition-colors duration-300 flex items-center justify-center"
                     style={{ color: social.color }}
                   >

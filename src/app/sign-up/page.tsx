@@ -122,8 +122,8 @@ export default function SigUpPage() {
       
       await signUp(formDataSignUp);
       router.push("/sign-in");
-    } catch (error: any) {
-      console.error(error.message || "Error al registrarse.");
+    } catch (error: unknown) {
+      console.error(error instanceof Error ? error.message : "Error al registrarse.");
     } finally {
       setIsLoading(false);
     }

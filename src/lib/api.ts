@@ -1,10 +1,14 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
 
+interface ApiRequestConfig extends AxiosRequestConfig {
+  data?: unknown;
+}
+
 export const apiRequest = async <T>(
   method: Method,
   endpoint: string,
-  data?: any,
-  config?: AxiosRequestConfig
+  data?: unknown,
+  config?: ApiRequestConfig
 ): Promise<T> => {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -51,7 +55,7 @@ export const apiRequest = async <T>(
     });
 
     return response.data as T;
-  } catch (error: any) {
+  } catch (error) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       const requestUrl = error.config?.url;
