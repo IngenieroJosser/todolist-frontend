@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
-import { Project, Todo } from '@/lib/interface';
+import { Project, Todo } from '@/lib/typings';
 
 export default function WorkSpaceDashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
