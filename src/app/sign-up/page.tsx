@@ -20,7 +20,7 @@ export default function SigUpPage() {
     name: '',
     email: '',
     password: '',
-    age: ''
+    age: 0
   });
   const router = useRouter();
   
@@ -437,7 +437,7 @@ export default function SigUpPage() {
                             id="age"
                             type="number"
                             value={formDataSignUp.age}
-                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, age: e.target.value })}
+                            onChange={(e) => setFormDataSignUp({ ...formDataSignUp, age: Number(e.target.value) })}
                             className={`w-full bg-[#0e1a26] border ${
                               errors.age ? 'border-red-500' : 'border-[#2a3a4a]'
                             } rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all duration-300 placeholder-[#5a7a8c]`}

@@ -34,14 +34,18 @@ export default function SignInPage() {
     setIsLoading(true);
     setError('');
     const { email, password } = formDataSignIn;
+    console.log("Objetos del login: ", formDataSignIn);
 
     try {
       const res = await signIn({ email, password });
+      console.log("Respuesta del backend: ", res);
       localStorage.setItem("token", res.token);
-      localStorage.setItem("userRole", res.user.email);
-      localStorage.setItem("userName", res.user.name);
+      localStorage.setItem("userRole", res.email);
+      localStorage.setItem("userName", res.name);
       // toast.success(`Hola, ${response.user.name || "Usuario"}!`);
-      localStorage.setItem("user", JSON.stringify(res.user));
+      localStorage.setItem("user", JSON.stringify(res));
+
+      router.push("/workspace")
     } catch (error: any) {
       setError(error.message);
     } finally {

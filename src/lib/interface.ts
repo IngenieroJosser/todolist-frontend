@@ -2,7 +2,7 @@ export interface SignUpData {
   name: string;
   email: string;
   password: string;
-  age: string;
+  age: number;
 }
 
 export interface SignInData {
@@ -12,12 +12,10 @@ export interface SignInData {
 
 export interface AuthResponse {
   token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    age: string;
-    // role: 'SELLER' | 'ADMIN' | 'BUYER';
-  };
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  age: number;
+  // role: 'SELLER' | 'ADMIN' | 'BUYER';
 }
