@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
-import { Project, Todo } from '@/lib/typings';
+import { Project, ProjectData, Todo } from '@/lib/typings';
+import { createProject } from '@/services/project-service';
 
 export default function WorkSpaceDashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
@@ -18,8 +19,12 @@ export default function WorkSpaceDashboardPage() {
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showCreateProyect, setShowCreateProyect] = useState<boolean>(false);
-  const [projectName, setProjectName] = useState<string>('');
-  const [projectDescription, setProjectDescription] = useState<string>('');
+  const [dataProject, setDataProject] = useState<ProjectData>({
+    name: '',
+    description: ''
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
@@ -111,34 +116,16 @@ export default function WorkSpaceDashboardPage() {
   });
 
   const handleCreateProject = async () => {
+    setIsLoading(true);
+    setError('');
+
+    if (!dataProject) return;
     try {
-      // Lógica para crear el proyecto en tu API
-      const newProject = {
-        name: projectName,
-        description: projectDescription
-      };
-
-      // Ejemplo de llamada a la API
-      const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProject),
-      });
-
-      if (response.ok) {
-        // Proyecto creado exitosamente
-        setShowCreateProyect(false);
-        setProjectName('');
-        setProjectDescription("");
-        // Actualizar la lista de proyectos
-      } else {
-        // Manejar error
-        console.error('Error al crear el proyecto');
-      }
-    } catch (error) {
-      console.error('Error:', error);
+      await createProject(dataProject)
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Error creando el proyecto');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -510,10 +497,7 @@ export default function WorkSpaceDashboardPage() {
               </div>
 
               <div className="p-6">
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  handleCreateProject();
-                }}>
+                <form onSubmit={handleCreateProject}>
                   <div className="mb-5 relative">
                     <label htmlFor="projectName" className="block text-sm font-medium text-[#a9c7d8] mb-2">
                       Nombre del Proyecto
@@ -527,8 +511,8 @@ export default function WorkSpaceDashboardPage() {
                       <input
                         type="text"
                         id="projectName"
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
+                        value={dataProject.name}
+                        onChange={(e) => setDataProject({ ...dataProject, name: e.target.value })}
                         className="w-full bg-[#1a2a3a] border border-[#2a3a4a] rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all"
                         placeholder="Ingresa el nombre del proyecto"
                         required
@@ -548,8 +532,8 @@ export default function WorkSpaceDashboardPage() {
                       </div>
                       <textarea
                         id="projectDescription"
-                        value={projectDescription}
-                        onChange={(e) => setProjectDescription(e.target.value)}
+                        value={dataProject.description}
+                        onChange={(e) => setDataProject({ ...dataProject, description: e.target.value })}
                         rows={4}
                         className="w-full bg-[#1a2a3a] border border-[#2a3a4a] rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-[#5ab9ea] transition-all"
                         placeholder="Describe el propósito del proyecto..."

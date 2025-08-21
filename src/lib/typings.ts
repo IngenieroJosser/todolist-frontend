@@ -73,3 +73,14 @@ export interface TaskResponse {
   message: string;
   data?: never;
 }
+
+export interface ProjectData {
+  name: string;
+  description: string;
+}
+
+export interface ProjectResponse {
+  success: boolean;
+  message: string;
+  data?: never;
+}

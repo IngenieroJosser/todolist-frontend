@@ -6,5 +6,5 @@ export async function createTask(data: TaskData): Promise<TaskResponse> {
 }
 
 export async function getAllTask(): Promise<TaskData[]> {
-  return await apiRequest<TaskData[]>('POST','/tasks');
+  return await apiRequest<TaskData[]>('POST',`/tasks`);
 }
