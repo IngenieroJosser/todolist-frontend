@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
 import { Project, ProjectData, Todo } from '@/lib/typings';
-import { createProject } from '@/services/project-service';
+import { createProject, getAllProject } from '@/services/project-service';
 
 export default function WorkSpaceDashboardPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ProjectData[]>([]);
   const [newTodo, setNewTodo] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [activeProject, setActiveProject] = useState('all');
@@ -39,12 +39,7 @@ export default function WorkSpaceDashboardPage() {
       { id: 5, text: 'Enviar reporte mensual', completed: true, priority: 'low', dueDate: '2023-10-10', tags: ['Administración'] }
     ]);
 
-    setProjects([
-      { id: 1, name: 'Proyecto Alpha', color: '#5ab9ea', taskCount: 8 },
-      { id: 2, name: 'Marketing Q4', color: '#ff7eb3', taskCount: 12 },
-      { id: 3, name: 'Desarrollo Web', color: '#7af9a9', taskCount: 5 },
-      { id: 4, name: 'Recursos Humanos', color: '#ffb366', taskCount: 3 }
-    ]);
+    getProjects();
 
     // Actualizar la hora cada minuto
     const updateTime = () => {
@@ -129,6 +124,29 @@ export default function WorkSpaceDashboardPage() {
     }
   };
 
+  const getProjects = async () => {
+    setIsLoading(true);
+    setError('');
+  
+    try {
+      const response = await getAllProject();
+      const projects = response.products || response; 
+      
+      // Add default values for missing properties
+      const projectsWithDefaults = projects.map(project => ({
+        ...project,
+        color: project.color || '#5ab9ea',
+        taskCount: project.taskCount || 0
+      }));
+      
+      setProjects(projectsWithDefaults);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Error mostrando los proyectos');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0e1a26] to-[#0f1a27] text-white flex">
       <Head>
@@ -142,7 +160,7 @@ export default function WorkSpaceDashboardPage() {
           <>
             {[...Array(30)].map((_, i) => (
               <div
-                key={i}
+                key={`particle-${i}`}  // Fixed key with unique prefix
                 className="absolute rounded-full bg-white animate-pulse"
                 style={{
                   top: `${Math.random() * 100}%`,
@@ -214,7 +232,7 @@ export default function WorkSpaceDashboardPage() {
           <div className="space-y-2">
             {projects.map(project => (
               <button
-                key={project.id}
+                key={project.id || `project-${project.name}`}  // Fixed key with fallback
                 className="w-full text-left px-3 py-2 rounded-lg hover:bg-[#1a2a3a] transition-all duration-300 flex items-center justify-between"
                 onClick={() => setActiveProject(project.name)}
               >
@@ -557,7 +575,7 @@ export default function WorkSpaceDashboardPage() {
                       className="px-5 py-2.5 bg-gradient-to-r from-[#5ab9ea] to-[#4ca5d5] text-[#0e1a26] font-medium rounded-lg hover:from-[#4ca5d5] hover:to-[#3e91c1] transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 01118 0z" />
                       </svg>
                       Crear Proyecto
                     </button>

@@ -75,12 +75,20 @@ export interface TaskResponse {
 }
 
 export interface ProjectData {
+  id?: number;
   name: string;
   description: string;
+  color?: string;
+  taskCount?: number;
 }
 
 export interface ProjectResponse {
   success: boolean;
   message: string;
   data?: never;
+}
+
+export interface ProjectListResponse {
+  message: string;
+  products: ProjectData[];
 }
